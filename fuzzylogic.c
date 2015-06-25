@@ -1,5 +1,5 @@
 /*
- * fuzzylogic1.c
+ * fuzzylogic.c
  *
  *  Created on: Jun 25, 2015
  *      Author: Bryce
