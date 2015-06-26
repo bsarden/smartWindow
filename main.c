@@ -14,16 +14,12 @@
 #include <stdbool.h>
 
 int main(void) {
-	// Sets light to blink on P1.0 every .5 sec
-	Heartbeat_Init();
-	// takes in values depending upon the amount of sunlight
-	ADC_Init();
-	// sends output of fuzzy logic control to DAC/Voltage regulator
-	SPI_Init();
+	Heartbeat_Init();                   // sets light to blink on P1.0 every .5sec
+	ADC_Init();                         // takes in values depending upon the amount of sunlight
+	SPI_Init();                         // sends output of fuzzy logic control to DAC/Voltage regulator
 
-	// wait in low power mode
 	while(1) {
-		MAP_PCM_gotoLPM0();
+		MAP_PCM_gotoLPM0();             // wait in low power mode
 	}
 }
 

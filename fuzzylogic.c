@@ -30,7 +30,7 @@ extern int32_t TXData;	// SPI transmission data
 /* Membership functions are associated with each system input and output */
 struct mf_type {
 	uint8_t name[MAX_NAME]; 		// name of the membership function
-	int32_t value;					// degree of membership/output strength
+	int32_t value;                  // degree of membership/output strength
 	int32_t startVal;				// leftmost x-axis point of membership function
 	int32_t ascSlope; 				// slope of left side of membership function
 	int32_t endVal;					// rightmost x-axis point of membership function
@@ -57,7 +57,6 @@ struct rule_type * Rule_Base;				// list of all the rules in rule base, will nee
 											// will need to create this as a static list
 struct mf_type * Membership_Functions;		// list of all the membership functions that we are using
 
-
 /*************************************** HELPER FUNCTIONS ***************************************/
 
 int32_t min(int32_t x, int32_t y) {
@@ -71,15 +70,22 @@ int32_t max(int32_t x, int32_t y) {
  * a new set of output strengths which affect the areas of trapezoidal membership.
  */
 int32_t compute_area_of_trapezoid(struct mf_type * mf) {
-	int16_t run1,run2,base,top,area;
+    // Initialization
+	int16_t run1;
+    int16_t run2;
+    int16_t base;
+    int16_t top;
+    int16_t area;
+
+    // calculate area
 	base = mf->endVal - mf->startVal;
 	run1 = mf->value/mf->ascSlope;
 	run2 = mf->value/mf->dscSlope;
 	top = base - run1 - run2;
 	return (mf->value * (base + top) / 2);
 }
-/*************************************** PUBLIC FUNCTIONS ***************************************/
 
+/*************************************** PUBLIC FUNCTIONS ***************************************/
 
 /* Compute Degree of Membership -- Degree to which input val is a member of my current membersip function
  * 1. Compute Delta terms to determine if input is inside or outside my membership functions
@@ -109,13 +115,11 @@ int32_t compute_degree_of_membership(struct mf_type * mf, int32_t input) {
  */
 int32_t fuzzification(int32_t crispVal) {
 	// Initialization
-	int16_t status = 0;
 	struct mf_type * mf = Membership_Functions;		// membership function pointer, initializes to first membership function
 	for(; mf != NULL; mf = mf->next) {
-		status = compute_degree_of_membership(mf, crispVal);
-		if(!status) { break; }
+		compute_degree_of_membership(mf, crispVal);
 	}
-	return status;
+	return 1;
 }
 
 /* Rule Evaluation -- Each rule consists of a list of pointers to antecedents(IF side), list of pointers to outputs(THEN side),
@@ -127,7 +131,7 @@ int32_t rule_evaluation(void) {
 	struct rule_type * rule;
 	struct rule_element_type * if_ptr;
 	struct rule_element_type * then_ptr;
-	rule = &Rule_Base;
+	rule = Rule_Base;
 	int32_t strength;
 
 	// iterate through the rule base
@@ -136,12 +140,12 @@ int32_t rule_evaluation(void) {
 		if_ptr = rule->if_side;
 		then_ptr = rule->then_side;
 		// process if-side of rule to determine strength
-		for(; if_ptr != NULL; if_pter = if_ptr->next) {
+		for(; if_ptr != NULL; if_ptr = if_ptr->next) {
 			strength = min(strength, *(if_ptr->value));
 		}
 		// process then-side of rule to apply strength
 		for(; then_ptr != NULL; then_ptr = then_ptr->next) {
-			*(then_ptr->value) = max(strength, *(tp->value));
+			*(then_ptr->value) = max(strength, *(then_ptr->value));
 		}
 	}
 
@@ -171,8 +175,16 @@ int32_t defuzzification() {
 	return (sum_of_products / sum_of_areas);	// weighted average
 }
 
+
+//*****************************************************************************
+//
+//! Uses fuzzy logic to convert value coming in from the ADC into an output 
+//! value for the DAC 
+//
+//*****************************************************************************
 int32_t convert_to_system_output(int32_t adcVal) {
 	fuzzification(adcVal);
 	rule_evaluation();
 	TXData = defuzzification();
+    return 1;               // success
 }
