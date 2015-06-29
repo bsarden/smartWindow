@@ -24,34 +24,33 @@
 #define MAX_NAME 10 // max number of characters in names
 #define UPPER_LIMIT 255 // max strength of a membership function
 
-
 extern int32_t TXData;	// SPI transmission data
 
 /* Membership functions are associated with each system input and output */
-struct mf_type {
+typedef struct mf_type {
 	uint8_t name[MAX_NAME]; 		// name of the membership function
 	int32_t value;                  // degree of membership/output strength
 	int32_t startVal;				// leftmost x-axis point of membership function
 	int32_t ascSlope; 				// slope of left side of membership function
 	int32_t endVal;					// rightmost x-axis point of membership function
 	int32_t dscSlope;				// slope of right side of membership function
-	struct mf_type * next; 			// pointer to the next membership function
-};
+	struct mf_type * next;       			// pointer to the next membership function
+}mf_type;
 
 /* each rule has an IF side and a THEN side. Elements that make up the IF side are pointers to the values inside of
  * the mf_type structs. The THEN side consists of pointers to the output strength values inside of the mf_types.
  * Each rule contains a pointer to the next rule in the rule base
  */
-struct rule_element_type {
+typedef struct rule_element_type {
 	int * value;						// pointer to previous output strength value
 	struct rule_element_type * next; 	// next output element in the rule
-};
+}rule_element_type;
 
-struct rule_type {
-	struct rule_element_type * if_side;		// list of antecedents in rule
-	struct rule_element_type * then_side; 	// list of outputs in rule
-	struct rule_type * next; 				// next rule in the rule base
-};
+typedef struct rule_type {
+	rule_element_type * if_side;		// list of antecedents in rule
+	rule_element_type * then_side; 	    // list of outputs in rule
+	struct rule_type * next; 				    // next rule in the rule base
+}rule_type;
 
 struct rule_type * Rule_Base;				// list of all the rules in rule base, will need to declare this
 											// will need to create this as a static list
@@ -98,6 +97,7 @@ int32_t compute_degree_of_membership(struct mf_type * mf, int32_t input) {
 	int32_t delta1, delta2;
 	delta1 = input - mf->startVal;
 	delta2 = mf->endVal - input;
+
 	if((delta1 <= 0) || (delta2 <= 0)) {	// input outside membership function
 		mf->value = 0;
 		status = 1;
@@ -115,7 +115,7 @@ int32_t compute_degree_of_membership(struct mf_type * mf, int32_t input) {
  */
 int32_t fuzzification(int32_t crispVal) {
 	// Initialization
-	struct mf_type * mf = Membership_Functions;		// membership function pointer, initializes to first membership function
+	mf_type * mf = Membership_Functions;		// membership function pointer, initializes to first membership function
 	for(; mf != NULL; mf = mf->next) {
 		compute_degree_of_membership(mf, crispVal);
 	}
@@ -128,9 +128,9 @@ int32_t fuzzification(int32_t crispVal) {
  * already been assigned a rule strength, the if will be OR'ed and a max function will be used to determine the resulting strength
  */
 int32_t rule_evaluation(void) {
-	struct rule_type * rule;
-	struct rule_element_type * if_ptr;
-	struct rule_element_type * then_ptr;
+	rule_type * rule;
+	rule_element_type * if_ptr;
+    rule_element_type * then_ptr;
 	rule = Rule_Base;
 	int32_t strength;
 
@@ -156,8 +156,8 @@ int32_t rule_evaluation(void) {
  * Defuzzification -- converts all of of the fuzzified output values into a crisp output
  * by using the weighted average of all of the fuzzified values.
  */
-int32_t defuzzification() {
-	struct mf_type * mf;			// output membership function pointer
+int32_t defuzzification(void) {
+    mf_type * mf;           			// output membership function pointer
 	int32_t sum_of_products = 0; 		// sum of products of area and centroid
 	int32_t sum_of_areas = 0;			// sum of shortend trapezoid area
 	int32_t area = 0;
@@ -188,3 +188,4 @@ int32_t convert_to_system_output(int32_t adcVal) {
 	TXData = defuzzification();
     return 1;               // success
 }
+// eof
