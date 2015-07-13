@@ -101,8 +101,14 @@ var fastOpague = fuzzylogic.or(fuzzylogic.and(sunnyGrade, verySunnyGrade), veryS
 // for the control system
 // I am centering the system around the middle value, 128 so I will be picking values accordingly
 
-var crispOutput = ((1 * fastTransparent) + (60  * slowTransparent) + (120 * normal) + (180 * slowOpague) + (fastOpague * 255))/
-    (fastTransparent + slowTransparent + normal + slowOpague + fastOpague);
+// constants that are used for calibration
+var LOW = 1;
+var LOW_MID = 60;
+var MID = 120;
+var MID_HIGH = 180;
+var HIGH = 255;
+var crispOutput = ((LOW * fastTransparent) + (LOW_MID  * slowTransparent) + (MID * normal) + 
+        (MID_HIGH * slowOpague) + (HIGH * fastOpague)) / (fastTransparent + slowTransparent + normal + slowOpague + fastOpague);
 
 //msg.payload.fuzzy = fuzzylogic.trapezoid(msg.payload.myWifiSensor.light, 0, 200, 300, 500);
 //value of 800 means output of 0 V, which is 100% opaque
