@@ -27,18 +27,23 @@ void callback(char* topic, byte* payload, unsigned int length) {
 //  Serial.print("with length ");
 //  Serial.println(length);
 //  Serial.println("Message:");
-//    Serial.write(payload, length);
+//  Serial.write(payload, length);
     payload[length] = '\0';
     autoOutputVal = atoi((char *) payload);
     Serial.print("autoOutputVal: "); Serial.println(autoOutputVal);
-//    delay(100);
-//    Serial.println(topic);
+//  delay(100);
+//  Serial.println(topic);
 //  Serial.println();
 }
 
 WiFiClient wifiClient;
 PubSubClient client(server, 1883, callback, wifiClient);
 
+/*
+ * Connects to the internet using the provided ssid and password
+ * Creates a new Event that sends ack to JSONify.ino to begin creating
+ * JSON Strings to output to server
+ */
 void setup()
 {
   Serial.begin(115200);
@@ -74,6 +79,11 @@ void setup()
   wifiReady.send();
 }
 
+/*
+ * Waits for a JSONpayload to be created
+ * Subscribes to MQTT broker to retrieve new I2C output value
+ * Publishes JSON payload with most recent light reading for fuzzylogic processing
+ */
 void loop()
 {
   myEvent.waitFor();      // wait for the next JSON event to be triggered
@@ -85,7 +95,7 @@ void loop()
       Serial.println("Connection failed");
     } else {
       Serial.println("Connection success");
-      if(client.subscribe("outputFuzzyVal")) {
+      if(client.subscribe("outputFuzzyVal")) {      // pull I2C output val from node-red server 
         Serial.println("Subscription successfull");
       }
     }
@@ -120,9 +130,12 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
-/**
+
+/*
  * Parse the JSON String we receive from the MQTT server
  * returns the integer value from the light sensor
+ * this code is not used at the moment because we changed the output of the message from the server side
+ * however, if we ever have to parse a Json message on the msp side, this will be useful
  */
 char * parseJson(char *jsonString) 
 {
@@ -130,20 +143,20 @@ char * parseJson(char *jsonString)
     char* value;
     
     aJsonObject* root = aJson.parse(jsonString);
-//    value = aJson.print(root)+'\0'; // Convert JSON object to char array
-//    Serial.println(value);
+    // value = aJson.print(root)+'\0'; // Convert JSON object to char array
+    // Serial.println(value);
     
     if (root != NULL) {    // myWifiSensor
-//        Serial.println("Parsed successfully 1 " );
-        aJsonObject* light = aJson.getObjectItem(root, "light");
-        value = aJson.print(light)+'\0'; // Convert JSON object to char array
-        Serial.println(value);
-        if(light != NULL) {
-            value = light->valuestring;
-//                Serial.println(value);
-//                return atoi(value);
-        }
-     }  
+       // Serial.println("Parsed successfully 1 " );
+       aJsonObject* light = aJson.getObjectItem(root, "light");
+       // value = aJson.print(light)+'\0'; // Convert JSON object to char array
+       // Serial.println(value);
+       if(light != NULL) {
+           value = light->valuestring;
+               // Serial.println(value);
+               // return atoi(value);
+       }
+    }  
     
     if(value) {
       return value;

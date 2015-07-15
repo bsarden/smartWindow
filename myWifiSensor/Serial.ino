@@ -1,5 +1,5 @@
 /*
- * debugging utility that prints out the contents of the light sensor
+ * debugging utility that the contents of the light sensor to the console
  */
  
 void setupSerial() {

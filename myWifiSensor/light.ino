@@ -1,5 +1,5 @@
 /* 
- * Samples the light sensor values 10 times / sec
+ * Samples the light sensor values 5 times / sec
  * value for the sensor is stored in the light global var
  */
  

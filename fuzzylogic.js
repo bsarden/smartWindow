@@ -1,8 +1,13 @@
+// fuzzylogic.js
+// Author: Bryce Arden
+// July, 2015
+
 // This is the code that goes into the fuzzylogic module on the node red server
 // If that code ever gets deleted, this is our backup
+// The basis for the fuzzylogic code was adopted from the NodeJS fuzzy logic library
+// found here https://github.com/sebs/node-fuzzylogic
 
-// rules functionality
-
+// definition of a fuzzylogic shape
 function Shape(x0, x1, x2, x3) {
     this.x0 = x0;
     this.x1 = x1;
@@ -10,10 +15,15 @@ function Shape(x0, x1, x2, x3) {
     this.x3 = x3;
 }
 
+// for the purpose of smartWindow, we will only be using the trapezoid shape for 
+// membership sets. However, this functionality can be extended to use other shapes
+// for membership sets, such as Triangles, Rectangles, etc...
 function Trapezoid(x0, x1, x2, x3) {
     Shape.call(this, x0, x1, x2, x3);
 }
 
+// defines how membership grade is determined from an input value
+// uses basic trig
 Trapezoid.prototype = {
     evaluate: function (val) {
         var result = 0, x = val;
@@ -33,6 +43,7 @@ Trapezoid.prototype = {
     }
 };
 
+// declaration of the fuzzylogic struct that we will use for this project
 var fuzzylogic = { 
     trapezoid: function (val, x0, x1, x2, x3) {
         return new Trapezoid(x0, x1, x2, x3).evaluate(val);
@@ -43,24 +54,6 @@ var fuzzylogic = {
     or : function (a, b) {
         return Math.max(a,b);
     },
-    // and: function (a, b, cbA, cbB) {
-    //     var ret = Math.min(a, b);
-    //     if (ret === a) {
-    //         cbA(ret);
-    //     } else {
-    //         cbB(ret);
-    //     }
-    //     return ret;
-    // },
-    // or: function (a, b, cbA, cbB) {
-    //     var ret = Math.max(a, b);
-    //     if (ret === a) {
-    //         cbA(ret);
-    //     } else {
-    //         cbB(ret);
-    //     }
-    //     return ret;
-    // },
     not: function (a) {
         return 1.0 - a;
     }
@@ -76,11 +69,7 @@ var normalGrade = fuzzylogic.trapezoid(light, 320, 400, 480, 560);
 var sunnyGrade = fuzzylogic.trapezoid(light, 480, 560, 640, 720);
 var verySunnyGrade = fuzzylogic.trapezoid(light, 640, 720, 800, 800); //opaque
 
-// var or = fuzzylogi.or;
-// var and = fuzzylogic.and;
-// var not = fuzzylogic.not;
 // rule evaluation
-
 // slow transparent IF (normal AND shady) OR (shady)
 var slowTransparent = fuzzylogic.or(fuzzylogic.and(normalGrade, shadyGrade), shadyGrade);
 
@@ -97,8 +86,7 @@ var slowOpague = fuzzylogic.or(fuzzylogic.and(normalGrade, shadyGrade), sunnyGra
 var fastOpague = fuzzylogic.or(fuzzylogic.and(sunnyGrade, verySunnyGrade), verySunnyGrade);
 
 // because we know that the output of the dpot has the range [0, 255]
-// I can use a weighted average centered at the midpoint to achieve a balanced output 
-// for the control system
+// I can use a weighted average centered at the midpoint to achieve a balanced output for the control system
 // I am centering the system around the middle value, 128 so I will be picking values accordingly
 
 // constants that are used for calibration
@@ -110,7 +98,6 @@ var HIGH = 255;
 var crispOutput = ((LOW * fastTransparent) + (LOW_MID  * slowTransparent) + (MID * normal) + 
         (MID_HIGH * slowOpague) + (HIGH * fastOpague)) / (fastTransparent + slowTransparent + normal + slowOpague + fastOpague);
 
-//msg.payload.fuzzy = fuzzylogic.trapezoid(msg.payload.myWifiSensor.light, 0, 200, 300, 500);
 //value of 800 means output of 0 V, which is 100% opaque
 msg.payload.myWifiSensor.veryShady = Math.round((veryShadyGrade * 100)); //clear
 msg.payload.myWifiSensor.shady  = Math.round((shadyGrade * 100));
