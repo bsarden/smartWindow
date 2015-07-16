@@ -59,7 +59,29 @@ var fuzzylogic = {
     }
 };
 
+// read in the global values from the iOSInput message
+var summerMode = context.global.summerMode;
+var winterMode = context.global.winterMode;
+var manualMode = context.global.manualMode;
+var manualVal = parseInt(context.global.manualVal); // convert JSON string to int
+var automaticMode = context.global.automaticMode;
+
+// read in the light value from the mspMessage
 var light = msg.payload.myWifiSensor.light;
+
+// handle all of the iOS control functionality
+if(winterMode == "true") {          // for winter mode, reverse the logic
+    light = 800 - light;
+}
+if(manualMode == "true") {          // if we are in manualMode,append manualVal to msg and return
+    msg.payload.myWifiSensor.veryShady = 0;         // set all other vals to 0 for freeboard UI
+    msg.payload.myWifiSensor.shady  = 0;
+    msg.payload.myWifiSensor.normal = 0; 
+    msg.payload.myWifiSensor.sunny = 0;
+    msg.payload.myWifiSensor.verySunny =  0; //opaque
+    msg.payload.myWifiSensor.crispVal = Math.floor(manualVal);   
+    return msg;
+}
 
 // value of 800 means output of 0 V, which is 100% opaque
 // first, calculate the membership grade for each fuzzy set
