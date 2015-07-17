@@ -12,3 +12,5 @@ To create this library create a Directory in $USER/Documents/Energia/Libraries  
 To compile the Energia code, create a directory in $USER/Documents/Energia called myWifiSensor and copy and past all of the github files into it. That way we can create the project in the Energia "Sketchbook"
 
 You should be able to compile just fine from there 
+
+The smartwindow server directory contains the code that I wrote for the node-red server. To use this code, copy and paste the code into the appropriate function blocks
