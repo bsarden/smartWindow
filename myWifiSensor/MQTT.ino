@@ -22,18 +22,9 @@ char password[] = "apt2226wifi";
 char server[] = "iot.eclipse.org";
 
 void callback(char* topic, byte* payload, unsigned int length) {
-//  Serial.print("Received message for topic ");
-//  Serial.print(topic);
-//  Serial.print("with length ");
-//  Serial.println(length);
-//  Serial.println("Message:");
-//  Serial.write(payload, length);
     payload[length] = '\0';
-    autoOutputVal = atoi((char *) payload);
-    Serial.print("autoOutputVal: "); Serial.println(autoOutputVal);
-//  delay(100);
-//  Serial.println(topic);
-//  Serial.println();
+    outputVal = atoi((char *) payload);
+    // Serial.print("outputVal: "); Serial.println(outputVal);
 }
 
 WiFiClient wifiClient;
