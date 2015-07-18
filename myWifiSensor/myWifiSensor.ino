@@ -25,8 +25,7 @@ char* jsonPayload;
 
 // sensor globals
 int light = 0;
-int autoOutputVal = 1000;           // starting values for the I2C output, updated by MQTT incoming message
-int manualOutputVal = 1000;         // starting value for manual mode, changed by Buttons
+int outputVal = 100;    // default value for output
 
 // blank setup, not necessary for main file
 void setup() {
