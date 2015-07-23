@@ -24,7 +24,7 @@ char server[] = "iot.eclipse.org";
 void callback(char* topic, byte* payload, unsigned int length) {
     payload[length] = '\0';
     outputVal = atoi((char *) payload);
-    // Serial.print("outputVal: "); Serial.println(outputVal);
+    Serial.print("outputVal: "); Serial.println(outputVal);
 }
 
 WiFiClient wifiClient;
@@ -102,7 +102,7 @@ void loop()
   // Check if any message were received
   // on the topic we subsrcived to
   client.poll();
-  delay(200);
+  delay(100);
 }
 
 void printWifiStatus() {

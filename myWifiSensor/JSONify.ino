@@ -39,6 +39,6 @@ void loopJSON(){
     aJson.deleteItem(d);            // this library uses malloc. Free mem.
     aJson.deleteItem(root);         // this library uses malloc. Free mem.
     myEvent.send();                 // Trigger event! New JSON payload ready
-    delay(300);                     // Determines how often a new JSON payload is created  
+    delay(150);                     // Determines how often a new JSON payload is created  
 }
 
