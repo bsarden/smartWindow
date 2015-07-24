@@ -1,5 +1,5 @@
 # smartWindow
-Solar-Powered smart window that detects the amount of sun exposure and changes the opacity of a piece of electrochromic film.
+Smart window that detects the amount of sun exposure and changes the opacity of a piece of electrochromic film.
 
 This is a the repository for the  node js server code and our Energia code for the smartWindow project. 
 
